@@ -1,24 +1,14 @@
-CREATE TABLE users (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(120) NOT NULL,
-  email VARCHAR(160) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  role VARCHAR(20) NOT NULL DEFAULT 'USER',
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE topics (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  title VARCHAR(160) NOT NULL,
-  message TEXT NOT NULL,
+  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  title        VARCHAR(160) NOT NULL,
+  message      TEXT NOT NULL,
+  status       VARCHAR(20) NOT NULL DEFAULT 'ABERTO',
+  course       VARCHAR(120) NOT NULL,
+  author_id    BIGINT NOT NULL,
+  created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP NULL,
 
   message_hash CHAR(64) AS (SHA2(message, 256)) STORED,
-  author_id BIGINT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NULL,
-  CONSTRAINT fk_topics_author FOREIGN KEY (author_id) REFERENCES users(id),
-  CONSTRAINT uq_topic UNIQUE (title, message_hash)
+
+  UNIQUE KEY uq_topic_title_message (title, message_hash)
 );
-
-
-CREATE FULLTEXT INDEX ft_topics_message ON topics (message);
