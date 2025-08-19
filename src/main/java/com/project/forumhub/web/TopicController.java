@@ -4,6 +4,7 @@ import com.project.forumhub.domain.Topic;
 import com.project.forumhub.repository.TopicRepository;
 import com.project.forumhub.web.dto.TopicCreateRequest;
 import com.project.forumhub.web.dto.TopicResponse;
+import com.project.forumhub.web.dto.TopicUpdateRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -67,5 +68,45 @@ public class TopicController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> update(@PathVariable Long id,
+                                    @RequestBody @Valid TopicUpdateRequest req) {
+        var opt = repository.findById(id);
+        if (opt.isEmpty()) return ResponseEntity.notFound().build();
+
+        if (repository.existsByTitleAndMessageAndIdNot(req.title(), req.message(), id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Tópico duplicado (título + mensagem).");
+        }
+
+        var t = opt.get();
+        t.setTitle(req.title());
+        t.setMessage(req.message());
+        t.setCourse(req.course());
+        if (req.status() != null) t.setStatus(req.status());
+
+
+        return ResponseEntity.ok(TopicResponse.from(t));
+    }
+
+    @RestControllerAdvice
+    class ApiExceptionHandler {
+        @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+        ResponseEntity<String> handleDup(org.springframework.dao.DataIntegrityViolationException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Tópico duplicado (título + mensagem).");
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (!repository.existsById(id)) {
+            return ResponseEntity.notFound().build(); // 404
+        }
+        repository.deleteById(id);
+        return ResponseEntity.noContent().build();     // 204
+    }
 
 }

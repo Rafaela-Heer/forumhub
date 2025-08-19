@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 @Table(name = "topics")
 public class Topic {
 
-    public enum Status { ABERTO, FECHADO }
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -21,7 +19,7 @@ public class Topic {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private Status status = Status.ABERTO;
+    private TopicStatus status = TopicStatus.ABERTO;
 
     @Column(nullable = false, length = 120)
     private String course;
@@ -29,14 +27,11 @@ public class Topic {
     @Column(name = "author_id", nullable = false)
     private Long authorId;
 
-
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-
 
     public Long getId() { return id; }
 
@@ -46,8 +41,8 @@ public class Topic {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
+    public TopicStatus getStatus() { return status; }
+    public void setStatus(TopicStatus status) { this.status = status; }
 
     public String getCourse() { return course; }
     public void setCourse(String course) { this.course = course; }
@@ -60,4 +55,3 @@ public class Topic {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
-
