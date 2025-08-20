@@ -1,4 +1,4 @@
-<h1 align="center">ForumHub</h1>
+<h1 align="center">🖥️ForumHub💻</h1>
 <h2 align="center">API REST de um fórum de tópicos construída com Spring Boot 3, Java 21, MySQL 8, JPA/Hibernate, Flyway e JWT (Spring Security).</h2>
 
 ## Tecnologias
