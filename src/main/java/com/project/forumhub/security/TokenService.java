@@ -23,11 +23,12 @@ public class TokenService {
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration:3600}") long expirationSeconds
     ) {
-
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalArgumentException("jwt.secret não configurado");
+        }
         this.algorithm = Algorithm.HMAC256(secret);
         this.expirationSeconds = expirationSeconds;
     }
-
 
     public String generate(User user) {
         Instant now = Instant.now();
@@ -41,15 +42,6 @@ public class TokenService {
                 .sign(algorithm);
     }
 
-
-    public DecodedJWT verify(String token) throws JWTVerificationException {
-        return JWT.require(algorithm)
-                .withIssuer(ISSUER)
-                .build()
-                .verify(stripBearer(token));
-    }
-
-
     public String validateAndGetSubject(String token) {
         try {
             return verify(token).getSubject();
@@ -58,21 +50,11 @@ public class TokenService {
         }
     }
 
-
-    public Long getUserId(String token) {
-        try {
-            return verify(token).getClaim("uid").asLong();
-        } catch (JWTVerificationException e) {
-            return null;
-        }
-    }
-
-    public String getEmail(String token) {
-        try {
-            return verify(token).getSubject();
-        } catch (JWTVerificationException e) {
-            return null;
-        }
+    public DecodedJWT verify(String token) {
+        return JWT.require(algorithm)
+                .withIssuer(ISSUER)
+                .build()
+                .verify(stripBearer(token));
     }
 
     private static String stripBearer(String token) {

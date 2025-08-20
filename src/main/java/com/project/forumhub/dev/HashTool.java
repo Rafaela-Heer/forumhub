@@ -1,20 +1,22 @@
 package com.project.forumhub.dev;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class HashTool {
-    public static void main(String[] args) {
-        System.out.println(new BCryptPasswordEncoder().encode("123456"));
+@Component
+public class HashTool implements CommandLineRunner {
 
-        @Bean
-        CommandLineRunner printHashOnce(PasswordEncoder encoder) {
-            return args -> {
-                String raw = "minhasenha123"; // 👈 coloque a senha em texto que você quer usar no login
-                String hash = encoder.encode(raw);
-                System.out.println("\n\n=== HASH GERADO (BCrypt) ===\n" + hash + "\n============================\n");
-            };
-        }
+    private final PasswordEncoder encoder;
+
+    public HashTool(PasswordEncoder encoder) {
+        this.encoder = encoder;
+    }
+
+    @Override
+    public void run(String... args) {
+        String raw = "minhasenha123";
+        String hash = encoder.encode(raw);
+        System.out.println("\n HASH GERADO (BCrypt): \n" + hash);
     }
 }
